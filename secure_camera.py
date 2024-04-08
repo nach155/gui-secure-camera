@@ -37,6 +37,8 @@ def main():
     
     # 1. 描画エリア
     ret, frame = camera.read()
+    if not ret :
+        raise
     height, width, channels = frame.shape[:3]
     canvas = sg.Graph(
         (width,height),
