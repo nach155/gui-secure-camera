@@ -3,6 +3,8 @@ import numpy as np
 import cv2
 import tkinter as tk
 import datetime , os, time
+form picamera2 import Picamera2
+
 # global 
 FPS = 10
 WIDTH = 640
@@ -14,12 +16,16 @@ SENSITIVITY = 0.8
 
 def main():
     
+    camera = Picamera2()
+    camera.configure(camera.create_preview_configuration(main={"format": 'XRGB8888', "size": (WIDTH, HEIGHT)},controls={"FrameRate":FPS}))
+    camera.start()
+    
     # Webカメラを取得
     # camera = cv2.VideoCapture(0,cv2.CAP_DSHOW)
-    camera = cv2.VideoCapture(0)
-    camera.set(cv2.CAP_PROP_FPS,FPS)
-    camera.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
-    camera.set(cv2.CAP_PROP_FRAME_HEIGHT, HEIGHT)
+    # camera = cv2.VideoCapture(0)
+    # camera.set(cv2.CAP_PROP_FPS,FPS)
+    # camera.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
+    # camera.set(cv2.CAP_PROP_FRAME_HEIGHT, HEIGHT)
     # 1つ前のフレーム
     prev_frame = None
     ## 録画用パラメータ
@@ -38,9 +44,11 @@ def main():
     save_dir = None
     
     # 1. 描画エリア
-    ret, frame = camera.read()
-    if not ret :
-        raise
+    # ret, frame = camera.read()
+    frame = camera.capture_array()
+    
+    # if not ret :
+    #     raise
     height, width, channels = frame.shape[:3]
     canvas = sg.Graph(
         (width,height),
