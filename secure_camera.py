@@ -29,6 +29,8 @@ def main():
     shooting = False
     # マージンタイム(前後の余白)
     margin_time = 5
+    # 最大録画時間(秒)
+    max_recording_time = 300
     # ビデオ
     video = None
     video_setting = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
@@ -276,6 +278,7 @@ def main():
                 if movement is True:
                     last_movement_time = int(time.time())
                     if shooting is False:
+                        init_movement_time = last_movement_time # 録画を開始した時間を保持
                         window['LOG'].print(f"[{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 録画開始")
                         window['STATUS'].update('録画中')
                         shooting = True
@@ -286,7 +289,7 @@ def main():
                     if shooting is True :
                         video.write(original_frame)
                         
-                    if (time.time() - last_movement_time > margin_time):
+                    if (time.time() - last_movement_time > margin_time or (time.time() - init_movement_time) > max_recording_time):
                         window['LOG'].print(f"[{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 録画終了")
                         window['STATUS'].update('検知中')
                         video.release()
@@ -349,7 +352,7 @@ def move_recognize(frame, prev, start_x=0, start_y=0, end_x=WIDTH,end_y=HEIGHT):
         if w < 30 or h < 30: continue # 小さな変更点は無視
         if movement is False:
             movement = True
-        # break
+            # break
         cv2.rectangle(frame, (x, y), (x+w, y+h), RECT_COLOR, 2)
     # 認識範囲を表示
     cv2.rectangle(frame,(start_x,start_y),(end_x,end_y),RECOGNIZE_RANGE_COLOR,2)
